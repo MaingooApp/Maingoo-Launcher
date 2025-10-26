@@ -1,0 +1,15 @@
+[submodule "services/auth"]
+	path = services/auth
+	url = git@github.com:MaingooApp/ms-auth.git
+[submodule "services/gateway"]
+	path = services/gateway
+	url = git@github.com:MaingooApp/ms-gateway.git
+[submodule "services/documents-analyzer"]
+	path = services/documents-analyzer
+	url = git@github.com:MaingooApp/ms-analyzer.git
+[submodule "services/enterprises"]
+	path = services/enterprises
+	url = git@github.com:MaingooApp/ms-enterprises.git
+[submodule "services/suppliers"]
+	path = services/suppliers
+	url = git@github.com:MaingooApp/ms-suppliers.git
