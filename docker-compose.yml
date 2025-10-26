@@ -1,0 +1,165 @@
+version: "3.9"
+
+services:
+  # ======================
+  # Infrastructure
+  # ======================
+  nats-server:
+    image: nats:latest
+    container_name: maingoo-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - maingoo-net
+
+  # ======================
+  # Databases
+  # ======================
+  pg-auth:
+    image: postgres:16
+    container_name: pg-auth
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata-auth:/var/lib/postgresql/data
+    networks:
+      - maingoo-net
+
+  pg-analyzer:
+    image: postgres:16
+    container_name: pg-analyzer
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: analyzer_db
+      POSTGRES_USER: analyzer_user
+      POSTGRES_PASSWORD: analyzer_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata-analyzer:/var/lib/postgresql/data
+    networks:
+      - maingoo-net
+
+  pg-suppliers:
+    image: postgres:16
+    container_name: pg-suppliers
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: suppliers_db
+      POSTGRES_USER: suppliers_user
+      POSTGRES_PASSWORD: suppliers_pass
+    ports:
+      - "5436:5432"
+    volumes:
+      - pgdata-suppliers:/var/lib/postgresql/data
+    networks:
+      - maingoo-net
+
+  pg-enterprises:
+    image: postgres:16
+    container_name: pg-enterprises
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: enterprises_db
+      POSTGRES_USER: enterprises_user
+      POSTGRES_PASSWORD: enterprises_pass
+    ports:
+      - "5437:5432"
+    volumes:
+      - pgdata-enterprises:/var/lib/postgresql/data
+    networks:
+      - maingoo-net
+
+  # ======================
+  # Microservices
+  # ======================
+  gateway:
+    build: ./services/gateway
+    container_name: maingoo-gateway
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./services/gateway/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./services/gateway/.env
+    depends_on:
+      - nats-server
+      - auth
+      - documents-analyzer
+      - suppliers
+      - enterprises
+    networks:
+      - maingoo-net
+
+  auth:
+    build: ./services/auth
+    container_name: maingoo-auth
+    volumes:
+      - ./services/auth/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./services/auth/.env
+    depends_on:
+      - pg-auth
+      - nats-server
+    networks:
+      - maingoo-net
+
+  documents-analyzer:
+    build: ./services/documents-analyzer
+    container_name: maingoo-documents-analyzer
+    volumes:
+      - ./services/documents-analyzer/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./services/documents-analyzer/.env
+    depends_on:
+      - pg-analyzer
+      - nats-server
+    networks:
+      - maingoo-net
+
+  suppliers:
+    build: ./services/suppliers
+    container_name: maingoo-suppliers
+    volumes:
+      - ./services/suppliers/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./services/suppliers/.env
+    depends_on:
+      - pg-suppliers
+      - nats-server
+    networks:
+      - maingoo-net
+
+  enterprises:
+    build: ./services/enterprises
+    container_name: maingoo-enterprises
+    volumes:
+      - ./services/enterprises/src:/usr/src/app/src
+    command: npm run start:dev
+    env_file:
+      - ./services/enterprises/.env
+    depends_on:
+      - pg-enterprises
+      - nats-server
+    networks:
+      - maingoo-net
+
+networks:
+  maingoo-net:
+    name: maingoo-net
+
+volumes:
+  pgdata-auth:
+  pgdata-analyzer:
+  pgdata-suppliers:
+  pgdata-enterprises:
