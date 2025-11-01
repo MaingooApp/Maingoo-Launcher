@@ -74,13 +74,12 @@ services:
   gateway:
     build:
       context: ./services/gateway
-      dockerfile: Dockerfile
-    image: gcr.io/${GCP_PROJECT_ID}/maingoo-gateway:${IMAGE_TAG:-latest}
+      dockerfile: dockerfile.prod
+    image: ${AZURE_REGISTRY_NAME}.azurecr.io/maingoo-gateway:${IMAGE_TAG:-latest}
     container_name: maingoo-gateway-prod
     restart: always
     ports:
       - "${GATEWAY_PORT:-3000}:3000"
-    command: npm run start:prod
     depends_on:
       nats-server:
         condition: service_started
@@ -113,11 +112,10 @@ services:
   auth:
     build:
       context: ./services/auth
-      dockerfile: Dockerfile
-    image: gcr.io/${GCP_PROJECT_ID}/maingoo-auth:${IMAGE_TAG:-latest}
+      dockerfile: dockerfile.prod
+    image: ${AZURE_REGISTRY_NAME}.azurecr.io/maingoo-auth:${IMAGE_TAG:-latest}
     container_name: maingoo-auth-prod
     restart: always
-    command: npm run start:prod
     depends_on:
       pg-auth:
         condition: service_healthy
@@ -135,11 +133,10 @@ services:
   documents-analyzer:
     build:
       context: ./services/documents-analyzer
-      dockerfile: Dockerfile
-    image: gcr.io/${GCP_PROJECT_ID}/maingoo-documents-analyzer:${IMAGE_TAG:-latest}
+      dockerfile: dockerfile.prod
+    image: ${AZURE_REGISTRY_NAME}.azurecr.io/maingoo-documents-analyzer:${IMAGE_TAG:-latest}
     container_name: maingoo-documents-analyzer-prod
     restart: always
-    command: npm run start:prod
     depends_on:
       pg-analyzer:
         condition: service_healthy
@@ -157,11 +154,10 @@ services:
   suppliers:
     build:
       context: ./services/suppliers
-      dockerfile: Dockerfile
-    image: gcr.io/${GCP_PROJECT_ID}/maingoo-suppliers:${IMAGE_TAG:-latest}
+      dockerfile: dockerfile.prod
+    image: ${AZURE_REGISTRY_NAME}.azurecr.io/maingoo-suppliers:${IMAGE_TAG:-latest}
     container_name: maingoo-suppliers-prod
     restart: always
-    command: npm run start:prod
     depends_on:
       pg-suppliers:
         condition: service_healthy
