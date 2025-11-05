@@ -1,4 +1,4 @@
-.PHONY: help dev-infra build up down restart logs clean migrate migrate-auth migrate-analyzer migrate-suppliers migrate-enterprises seed prod-build prod-push prod-up prod-down prod-logs test test-gateway test-auth test-analyzer test-suppliers test-enterprises prisma-generate prisma-studio-auth prisma-studio-analyzer prisma-studio-suppliers prisma-studio-enterprises install format lint gateway-dev auth-dev analyzer-dev suppliers-dev enterprises-dev
+.PHONY: help dev-infra db-only build up down restart logs clean migrate migrate-auth migrate-analyzer migrate-suppliers migrate-enterprises seed prod-build prod-push prod-up prod-down prod-logs test test-gateway test-auth test-analyzer test-suppliers test-enterprises prisma-generate prisma-studio-auth prisma-studio-analyzer prisma-studio-suppliers prisma-studio-enterprises install format lint gateway-dev auth-dev analyzer-dev suppliers-dev enterprises-dev
 
 # Variables
 GCP_PROJECT_ID ?= your-gcp-project-id
@@ -22,6 +22,10 @@ up: ## Levantar todo con Docker Compose (infraestructura + microservicios)
 dev-infra: ## Levantar solo infraestructura (NATS + DBs)
 	@echo "🗄️  Levantando infraestructura..."
 	docker compose up -d nats-server pg-auth pg-analyzer pg-suppliers pg-enterprises
+
+db-only: ## Levantar solo las bases de datos PostgreSQL
+	@echo "💾 Levantando solo bases de datos..."
+	docker compose up -d pg-auth pg-analyzer pg-suppliers pg-enterprises
 
 migrate: ## Ejecutar migraciones de Prisma en todos los servicios con BD
 	@echo "📦 Ejecutando migraciones Prisma en contenedores..."
