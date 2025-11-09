@@ -18,6 +18,4 @@
 	path = services/suppliers
 	branch = main
 	url = git@github.com:MaingooApp/ms-suppliers.git
-[submodule "services/nats"]
-	path = services/nats
-	url = git@github.com:MaingooApp/nats.git
+
