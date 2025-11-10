@@ -162,12 +162,39 @@ maingoo-backend/
 - **pg-auth**: Base de datos PostgreSQL 16 para Auth (puerto 5433)
 - **pg-analyzer**: Base de datos PostgreSQL 16 para Documents-Analyzer (puerto 5435)
 - **pg-suppliers**: Base de datos PostgreSQL 16 para Suppliers (puerto 5436)
+- **pg-products**: Base de datos PostgreSQL 16 para Products (puerto 5438)
 - **gateway**: API Gateway HTTP (puerto 3000)
 - **auth**: Microservicio de autenticación (puerto 3001)
 - **documents-analyzer**: Microservicio de análisis de documentos (puerto 3002)
 - **suppliers**: Microservicio de proveedores (puerto 3003)
+- **products**: Microservicio de catálogo de productos (puerto 3004)
 
 Todos los contenedores comparten la red `maingoo-net`.
+
+## 📦 Flujo de Análisis de Facturas con Productos
+
+El sistema integra automáticamente el análisis de facturas con el catálogo de productos:
+
+```
+1. Usuario sube factura (iPhone/Web) → Gateway
+2. Gateway → Documents-Analyzer: Extrae información con AI
+3. Documents-Analyzer emite evento: documents.analyzed
+4. Suppliers escucha evento:
+   a. Procesa cada línea de factura
+   b. Llama a Products: findOrCreate(nombre, EAN)
+   c. Products busca o crea producto en catálogo
+   d. Suppliers guarda invoice con masterProductId en cada línea
+5. Suppliers emite evento: suppliers.invoice.processed
+6. Documents-Analyzer vincula documentId con invoiceId
+```
+
+**Beneficios:**
+
+- ✅ Catálogo de productos centralizado
+- ✅ Productos se vinculan automáticamente
+- ✅ Evita duplicados por nombre o EAN
+- ✅ Estadísticas y análisis de compras
+- ✅ Facilita comparación de precios entre proveedores
 
 ### Archivos Docker
 
