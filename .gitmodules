@@ -19,3 +19,7 @@
 	branch = main
 	url = git@github.com:MaingooApp/ms-suppliers.git
 
+[submodule "services/products"]
+	path = services/products
+	url = git@github.com:MaingooApp/ms-products.git
+	branch = master

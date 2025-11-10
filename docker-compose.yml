@@ -76,6 +76,21 @@ services:
     networks:
       - maingoo-net
 
+  pg-products:
+    image: postgres:16
+    container_name: pg-products
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: products_db
+      POSTGRES_USER: products_user
+      POSTGRES_PASSWORD: products_pass
+    ports:
+      - "5438:5432"
+    volumes:
+      - pgdata-products:/var/lib/postgresql/data
+    networks:
+      - maingoo-net
+
   # ======================
   # Microservices
   # ======================
@@ -95,6 +110,7 @@ services:
       - documents-analyzer
       - suppliers
       - enterprises
+      - products
     networks:
       - maingoo-net
 
@@ -154,6 +170,20 @@ services:
     networks:
       - maingoo-net
 
+  products:
+    build: ./services/products
+    container_name: maingoo-products
+    volumes:
+      - ./services/products/src:/usr/src/app/src
+    command: pnpm start:dev
+    env_file:
+      - ./services/products/.env
+    depends_on:
+      - pg-products
+      - nats-server
+    networks:
+      - maingoo-net
+
 networks:
   maingoo-net:
     name: maingoo-net
@@ -163,3 +193,4 @@ volumes:
   pgdata-analyzer:
   pgdata-suppliers:
   pgdata-enterprises:
+  pgdata-products:
