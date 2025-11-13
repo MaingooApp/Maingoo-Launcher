@@ -37,6 +37,8 @@ migrate: ## Ejecutar migraciones de Prisma en todos los servicios con BD
 	@docker exec maingoo-suppliers npx prisma db push
 	@docker exec maingoo-enterprises npx prisma generate
 	@docker exec maingoo-enterprises npx prisma db push
+	@docker exec maingoo-products npx prisma generate
+	@docker exec maingoo-products npx prisma db push
 	@echo "✅ Migraciones completadas"
 
 migrate-auth: ## Ejecutar migraciones solo en Auth
@@ -153,6 +155,7 @@ prisma-generate: ## Generar Prisma Client en todos los servicios (en contenedore
 	@docker exec maingoo-auth npx prisma generate
 	@docker exec maingoo-documents-analyzer npx prisma generate
 	@docker exec maingoo-suppliers npx prisma generate
+	@docker exec maingoo-products npx prisma generate
 	@echo "✅ Prisma Clients generados"
 
 prisma-studio-auth: ## Abrir Prisma Studio para Auth (en contenedor)
