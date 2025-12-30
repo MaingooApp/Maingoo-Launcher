@@ -30,36 +30,56 @@ db-only: ## Levantar solo las bases de datos PostgreSQL
 migrate: ## Ejecutar migraciones de Prisma en todos los servicios con BD
 	@echo "📦 Ejecutando migraciones Prisma en contenedores..."
 	@docker exec maingoo-auth npx prisma generate
-	@docker exec maingoo-auth npx prisma db push
+	@docker exec maingoo-auth npx prisma migrate deploy
 	@docker exec maingoo-documents-analyzer npx prisma generate
-	@docker exec maingoo-documents-analyzer npx prisma db push
+	@docker exec maingoo-documents-analyzer npx prisma migrate deploy
 	@docker exec maingoo-suppliers npx prisma generate
-	@docker exec maingoo-suppliers npx prisma db push
+	@docker exec maingoo-suppliers npx prisma migrate deploy
 	@docker exec maingoo-enterprises npx prisma generate
-	@docker exec maingoo-enterprises npx prisma db push
+	@docker exec maingoo-enterprises npx prisma migrate deploy
 	@docker exec maingoo-products npx prisma generate
-	@docker exec maingoo-products npx prisma db push
+	@docker exec maingoo-products npx prisma migrate deploy
 	@echo "✅ Migraciones completadas"
 
 migrate-auth: ## Ejecutar migraciones solo en Auth
 	@echo "📦 Migrando Auth..."
 	@docker exec maingoo-auth npx prisma generate
-	@docker exec maingoo-auth npx prisma db push
+	@docker exec maingoo-auth npx prisma migrate deploy
 
 migrate-analyzer: ## Ejecutar migraciones solo en Documents-Analyzer
 	@echo "📦 Migrando Documents-Analyzer..."
 	@docker exec maingoo-documents-analyzer npx prisma generate
-	@docker exec maingoo-documents-analyzer npx prisma db push
+	@docker exec maingoo-documents-analyzer npx prisma migrate deploy
 
 migrate-suppliers: ## Ejecutar migraciones solo en Suppliers
 	@echo "📦 Migrando Suppliers..."
 	@docker exec maingoo-suppliers npx prisma generate
-	@docker exec maingoo-suppliers npx prisma db push
+	@docker exec maingoo-suppliers npx prisma migrate deploy
 
 migrate-enterprises: ## Ejecutar migraciones solo en Enterprises
 	@echo "📦 Migrando Enterprises..."
 	@docker exec maingoo-enterprises npx prisma generate
-	@docker exec maingoo-enterprises npx prisma db push
+	@docker exec maingoo-enterprises npx prisma migrate deploy
+
+migrate-baseline: ## Marcar migraciones existentes como aplicadas (para bases de datos ya pobladas)
+	@echo "📌 Estableciendo baseline de migraciones..."
+	@echo "Auth..."
+	@docker exec maingoo-auth npx prisma migrate resolve --applied "0001_init" || true
+	@docker exec maingoo-auth npx prisma migrate resolve --applied "20251009070248_expand_user_schema_with_roles_permissions" || true
+	@echo "Documents-Analyzer..."
+	@docker exec maingoo-documents-analyzer npx prisma migrate resolve --applied "20251130211944_init" || true
+	@docker exec maingoo-documents-analyzer npx prisma migrate resolve --applied "20251219205520_add_line_item_fields" || true
+	@echo "Suppliers..."
+	@docker exec maingoo-suppliers npx prisma migrate resolve --applied "20251130210429_init" || true
+	@docker exec maingoo-suppliers npx prisma migrate resolve --applied "20251219202120_add_invoice_line_fields" || true
+	@echo "Enterprises..."
+	@docker exec maingoo-enterprises npx prisma migrate resolve --applied "20251105184005_init" || true
+	@echo "Products..."
+	@docker exec maingoo-products npx prisma migrate resolve --applied "20251110000000_init" || true
+	@docker exec maingoo-products npx prisma migrate resolve --applied "20251203200215_add_stock_to_product" || true
+	@docker exec maingoo-products npx prisma migrate resolve --applied "20251204000000_add_enterprise_id_to_product" || true
+	@docker exec maingoo-products npx prisma migrate resolve --applied "20251219203445_add_product_fields" || true
+	@echo "✅ Baseline establecido. Ahora ejecuta 'make migrate'"
 
 down: ## Detener todos los contenedores
 	@echo "⬇️  Stopping all services..."
