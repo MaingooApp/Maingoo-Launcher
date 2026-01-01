@@ -6,9 +6,12 @@ services:
   nats-server:
     image: nats:latest
     container_name: maingoo-nats
+    command: ["-c", "/config/nats-server.conf"]
     ports:
       - "4222:4222"
       - "8222:8222"
+    volumes:
+      - ./nats-server.conf:/config/nats-server.conf:ro
     networks:
       - maingoo-net
 
